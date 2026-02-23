@@ -2,163 +2,136 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>3Dverse — Інтернет-магазин</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3Dverse — Студія 3D друку</title>
     <style>
         body { font-family: sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
         header { background: #1a1a1a; color: #00d4ff; padding: 20px; text-align: center; border-bottom: 4px solid #00d4ff; }
-        nav { background: #333; padding: 10px; text-align: center; position: sticky; top: 0; }
-        nav button { padding: 10px 20px; margin: 5px; cursor: pointer; background: #00d4ff; border: none; font-weight: bold; border-radius: 5px; }
-        .page { display: none; padding: 20px; max-width: 800px; margin: 20px auto; background: white; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); min-height: 300px; }
+        nav { background: #333; padding: 10px; text-align: center; position: sticky; top: 0; z-index: 100; }
+        
+        .nav-btn { padding: 12px 20px; margin: 5px; cursor: pointer; background: #00d4ff; border: none; font-weight: bold; border-radius: 8px; }
+        .soc-btn { padding: 12px 20px; margin: 5px; cursor: pointer; background: #ff0050; color: white; border: none; font-weight: bold; border-radius: 8px; }
+        
+        .page { display: none; padding: 20px; max-width: 1000px; margin: 20px auto; background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); min-height: 400px; }
         .active { display: block; }
-        .product-card { border: 1px solid #ddd; padding: 15px; margin: 10px; display: inline-block; width: 200px; text-align: center; border-radius: 8px; vertical-align: top; }
-        .order-btn { background: #28a745; color: white; border: none; padding: 10px; width: 100%; cursor: pointer; border-radius: 5px; margin-top: 10px; font-weight: bold; }
-        input { display: block; width: 95%; padding: 10px; margin: 10px auto; border: 1px solid #ccc; border-radius: 5px; }
-        .admin-item { border-bottom: 1px solid #eee; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
+
+        .products-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px 0; }
+        .product-card { border: 1px solid #eee; padding: 15px; width: 240px; text-align: center; border-radius: 12px; background: #fff; }
+        .product-img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; background: #f9f9f9; }
+        
+        .order-btn { background: #28a745; color: white; border: none; padding: 12px; width: 100%; cursor: pointer; border-radius: 8px; font-weight: bold; margin-top: 10px; }
+        
+        /* Модальне вікно */
+        .modal { display: none; position: fixed; z-index: 200; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
+        .modal-content { background: white; margin: 20% auto; padding: 20px; border-radius: 15px; width: 280px; text-align: center; }
+        .soc-link { display: block; padding: 15px; margin: 10px 0; background: #eee; color: #333; text-decoration: none; font-weight: bold; border-radius: 10px; }
     </style>
 </head>
 <body>
 
     <header>
-        <h1 style="margin:0;">3Dverse</h1>
+        <h1 style="margin:0;">3DVERSE</h1>
     </header>
 
     <nav>
-        <button onclick="changePage('home')">Головна</button>
-        <button onclick="changePage('shop')">Товари</button>
-        <button onclick="changePage('admin')">Адмін-панель 🔒</button>
+        <button class="nav-btn" onclick="showH()">Головна</button>
+        <button class="nav-btn" onclick="showS()">Каталог</button>
+        <button class="soc-btn" onclick="openM()">Соцмережі 📱</button>
     </nav>
 
-    <div id="home" class="page active">
-        <h2>Вітаємо в 3Dverse</h2>
-        <p>Ми займаємося професійним 3D-друком. Обирайте готові товари або замовляйте свої проєкти.</p>
-        <button onclick="changePage('shop')" style="background: #00d4ff; padding: 15px 30px; border: none; cursor: pointer; font-weight: bold;">Перейти до товарів</button>
-    </div>
+    <div id="p-home" class="page active">
+        <div style="text-align: center; padding: 40px 10px;">
+            <h2>3Dverse - СОЦІАЛЬНЕ ШКІЛЬНЕ 
+ПІДПРИЄМНИЦТВО 
+СПРЯМОВАНЕ НА:</h2>
+            <p>1. Створення корисних речей для школи – 
+навчальних матеріалів, дидактичних ігор 
+та елементів декору, що оживляють 
+освітній простір; 
 
-    <div id="shop" class="page">
-        <h2>Наші товари</h2>
-        <div id="shop-container">
-            </div>
-    </div>
+2. Підтримку дітей з особливими 
+освітніми потребами – виготовлення 
+тактильних матеріалів і 3D-іграшок, які 
+допомагають навчатися через дотик і гру; 
 
-    <div id="admin" class="page">
-        <h2>Панель керування</h2>
-        <div style="background: #eee; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-            <input type="text" id="addName" placeholder="Назва товару">
-            <input type="text" id="addPrice" placeholder="Ціна (наприклад: 500 грн)">
-            <button onclick="addNewProduct()" style="width: 98%; background: #333; color: white; padding: 10px; cursor: pointer; border-radius: 5px;">Додати в магазин</button>
+3. Розвиток технічної творчості школярів 
+– навчання 3D-моделюванню, дизайну та 
+підприємництву через практику та 
+командну роботу; 
+
+4. Соціальну підтримку громади – 
+спрямування 15% прибутку на реалізацію 
+освітніх і благодійних ініціатив 
+(наприклад, закупівлю матеріалів для 
+інклюзивних класів).</p>
+            <button class="nav-btn" onclick="showS()" style="padding: 15px 30px;">Дивитися каталог</button>
         </div>
-        <h3>Активні товари:</h3>
-        <div id="admin-container"></div>
+    </div>
+
+    <div id="p-shop" class="page">
+        <h2 style="text-align: center;">Каталог</h2>
+        <div id="items-container" class="products-grid"></div>
+    </div>
+
+    <div id="m-soc" class="modal">
+        <div class="modal-content">
+            <h3>Ми в</h3>
+            <a href="https://www.instagram.com/3d.v.e.r.s.e?igsh=MTY5ZG0zcHRxbmpzbw==" target="_blank" class="soc-link">Instagram</a>
+            <a href="https://www.tiktok.com/@3d.v.e.r.s.e?_r=1&_t=ZS-94AHkaafY4G" target="_blank" class="soc-link">TikTok</a>
+            <button onclick="closeM()" style="margin-top:10px; cursor:pointer; border:none; background:none; color:red;">Закрити</button>
+        </div>
     </div>
 
     <script>
-        // ДАНІ ТЕЛЕГРАМ ТА ПАРОЛЬ
-        var PASS = "1234"; 
-        var BOT_TOKEN = "8669138374:AAG59umyk8H570ubxyuwUxDI0_Nc9KSttB4";
-        var USER_ID = "6995001814";
+        // ТЕЛЕГРАМ ДАНІ
+        var TOKEN = "8669138374:AAG59umyk8H570ubxyuwUxDI0_Nc9KSttB4";
+        var CHAT_ID = "6995001814";
 
-        // База даних товарів
-        var products = JSON.parse(localStorage.getItem('3dverse_prods')) || [
-            { name: "3D Дракон", price: "450 грн" },
-            { name: "Ваза Vortex", price: "300 грн" }
+        // ТВОЇ ТОВАРИ
+        var products = [
+            { name: "3D Дракон", price: "450 грн", img: "https://via.placeholder.com/250?text=Dragon" },
+            { name: "Ваза Vortex", price: "320 грн", img: "https://via.placeholder.com/250?text=Vase" }
         ];
 
-        // ФУНКЦІЯ ПЕРЕМИКАННЯ СТОРІНОК
-        function changePage(pageId) {
-            // Перевірка пароля для адмінки
-            if (pageId === 'admin') {
-                var ask = prompt("Введіть пароль:");
-                if (ask !== PASS) {
-                    alert("Доступ заборонено!");
-                    return;
-                }
-            }
-
-            // Ховаємо всі сторінки
-            var pages = document.getElementsByClassName('page');
-            for (var i = 0; i < pages.length; i++) {
-                pages[i].classList.remove('active');
-            }
-
-            // Показуємо потрібну
-            document.getElementById(pageId).classList.add('active');
-
-            // Оновлюємо дані на сторінці
-            if (pageId === 'shop') renderShop();
-            if (pageId === 'admin') renderAdmin();
+        // Функції перемикання (найпростіші)
+        function showH() {
+            document.getElementById('p-home').style.display = 'block';
+            document.getElementById('p-shop').style.display = 'none';
         }
-// ВІДОБРАЖЕННЯ В МАГАЗИНІ
-        function renderShop() {
-            var cont = document.getElementById('shop-container');
-            cont.innerHTML = "";
+function showS() {
+            document.getElementById('p-home').style.display = 'none';
+            document.getElementById('p-shop').style.display = 'block';
+            render();
+        }
+
+        function openM() { document.getElementById('m-soc').style.display = 'block'; }
+        function closeM() { document.getElementById('m-soc').style.display = 'none'; }
+
+        function render() {
+            var html = "";
             for (var i = 0; i < products.length; i++) {
                 var p = products[i];
-                cont.innerHTML += '<div class="product-card">' +
-                    '<h3>' + p.name + '</h3>' +
-                    '<p style="color:green; font-weight:bold;">' + p.price + '</p>' +
-                    '<button class="order-btn" onclick="orderNow(\'' + p.name + '\')">Замовити</button>' +
-                    '</div>';
+                html += '<div class="product-card">' +
+                        '<img src="' + p.img + '" class="product-img">' +
+                        '<h3>' + p.name + '</h3>' +
+                        '<p style="color:#28a745; font-weight:bold;">' + p.price + '</p>' +
+                        '<button class="order-btn" onclick="makeOrder(\'' + p.name + '\')">Замовити</button>' +
+                        '</div>';
+            }
+            document.getElementById('items-container').innerHTML = html;
+        }
+
+        function makeOrder(name) {
+            var phone = prompt("Ваше замовлення: " + name + "\nВведіть номер телефону:");
+            if (phone) {
+                var text = encodeURIComponent("🚀 ЗАМОВЛЕННЯ!\nТовар: " + name + "\nКонтакт: " + phone);
+                fetch("https://api.telegram.org/bot" + TOKEN + "/sendMessage?chat_id=" + CHAT_ID + "&text=" + text)
+                .then(function() { alert("Надіслано! Менеджер зв'яжеться з вами."); });
             }
         }
 
-        // ВІДОБРАЖЕННЯ В АДМІНЦІ
-        function renderAdmin() {
-            var cont = document.getElementById('admin-container');
-            cont.innerHTML = "";
-            for (var i = 0; i < products.length; i++) {
-                var p = products[i];
-                cont.innerHTML += '<div class="admin-item">' +
-                    '<span>' + p.name + ' (' + p.price + ')</span>' +
-                    '<button onclick="removeProduct(' + i + ')" style="color:red; cursor:pointer;">Видалити</button>' +
-                    '</div>';
-            }
-        }
-
-        // ДОДАТИ ТОВАР
-        function addNewProduct() {
-            var n = document.getElementById('addName').value;
-            var p = document.getElementById('addPrice').value;
-            if (n && p) {
-                products.push({ name: n, price: p });
-                localStorage.setItem('3dverse_prods', JSON.stringify(products));
-                alert("Товар додано!");
-                document.getElementById('addName').value = "";
-                document.getElementById('addPrice').value = "";
-                renderAdmin();
-            } else {
-                alert("Заповніть назву та ціну!");
-            }
-        }
-
-        // ВИДАЛИТИ ТОВАР
-        function removeProduct(index) {
-            if (confirm("Видалити товар?")) {
-                products.splice(index, 1);
-                localStorage.setItem('3dverse_prods', JSON.stringify(products));
-                renderAdmin();
-            }
-        }
-
-        // ВІДПРАВКА В ТЕЛЕГРАМ
-        function orderNow(pName) {
-            var contact = prompt("Замовляємо: " + pName + "\nВаш номер телефону або Telegram:");
-            if (contact && contact.trim() !== "") {
-                var msg = encodeURIComponent("📦 Нове замовлення!\nТовар: " + pName + "\nКонтакт: " + contact);
-                var url = "https://api.telegram.org/bot" + BOT_TOKEN + "/sendMessage?chat_id=" + USER_ID + "&text=" + msg;
-                
-                fetch(url).then(function(res) {
-                    if (res.ok) alert("Замовлення надіслано в Telegram!");
-                    else alert("Помилка Telegram. Перевірте, чи ви натиснули START у боті.");
-                }).catch(function() {
-                    alert("Помилка з'єднання.");
-                });
-            }
-        }
-
-        // Початкове завантаження
-        window.onload = function() {
-            renderShop();
-        };
+        // Початковий запуск
+        window.onload = render;
     </script>
 </body>
 </html>
