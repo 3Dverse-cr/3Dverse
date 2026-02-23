@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>3Dverse — Інтернет-магазин</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
+        header { background: #1a1a1a; color: #00d4ff; padding: 20px; text-align: center; border-bottom: 4px solid #00d4ff; }
+        nav { background: #333; padding: 10px; text-align: center; position: sticky; top: 0; }
+        nav button { padding: 10px 20px; margin: 5px; cursor: pointer; background: #00d4ff; border: none; font-weight: bold; border-radius: 5px; }
+        .page { display: none; padding: 20px; max-width: 800px; margin: 20px auto; background: white; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); min-height: 300px; }
+        .active { display: block; }
+        .product-card { border: 1px solid #ddd; padding: 15px; margin: 10px; display: inline-block; width: 200px; text-align: center; border-radius: 8px; vertical-align: top; }
+        .order-btn { background: #28a745; color: white; border: none; padding: 10px; width: 100%; cursor: pointer; border-radius: 5px; margin-top: 10px; font-weight: bold; }
+        input { display: block; width: 95%; padding: 10px; margin: 10px auto; border: 1px solid #ccc; border-radius: 5px; }
+        .admin-item { border-bottom: 1px solid #eee; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1 style="margin:0;">3Dverse</h1>
+    </header>
+
+    <nav>
+        <button onclick="changePage('home')">Головна</button>
+        <button onclick="changePage('shop')">Товари</button>
+        <button onclick="changePage('admin')">Адмін-панель 🔒</button>
+    </nav>
+
+    <div id="home" class="page active">
+        <h2>Вітаємо в 3Dverse</h2>
+        <p>Ми займаємося професійним 3D-друком. Обирайте готові товари або замовляйте свої проєкти.</p>
+        <button onclick="changePage('shop')" style="background: #00d4ff; padding: 15px 30px; border: none; cursor: pointer; font-weight: bold;">Перейти до товарів</button>
+    </div>
+
+    <div id="shop" class="page">
+        <h2>Наші товари</h2>
+        <div id="shop-container">
+            </div>
+    </div>
+
+    <div id="admin" class="page">
+        <h2>Панель керування</h2>
+        <div style="background: #eee; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+            <input type="text" id="addName" placeholder="Назва товару">
+            <input type="text" id="addPrice" placeholder="Ціна (наприклад: 500 грн)">
+            <button onclick="addNewProduct()" style="width: 98%; background: #333; color: white; padding: 10px; cursor: pointer; border-radius: 5px;">Додати в магазин</button>
+        </div>
+        <h3>Активні товари:</h3>
+        <div id="admin-container"></div>
+    </div>
+
+    <script>
+        // ДАНІ ТЕЛЕГРАМ ТА ПАРОЛЬ
+        var PASS = "1234"; 
+        var BOT_TOKEN = "8669138374:AAG59umyk8H570ubxyuwUxDI0_Nc9KSttB4";
+        var USER_ID = "6995001814";
+
+        // База даних товарів
+        var products = JSON.parse(localStorage.getItem('3dverse_prods')) || [
+            { name: "3D Дракон", price: "450 грн" },
+            { name: "Ваза Vortex", price: "300 грн" }
+        ];
+
+        // ФУНКЦІЯ ПЕРЕМИКАННЯ СТОРІНОК
+        function changePage(pageId) {
+            // Перевірка пароля для адмінки
+            if (pageId === 'admin') {
+                var ask = prompt("Введіть пароль:");
+                if (ask !== PASS) {
+                    alert("Доступ заборонено!");
+                    return;
+                }
+            }
+
+            // Ховаємо всі сторінки
+            var pages = document.getElementsByClassName('page');
+            for (var i = 0; i < pages.length; i++) {
+                pages[i].classList.remove('active');
+            }
+
+            // Показуємо потрібну
+            document.getElementById(pageId).classList.add('active');
+
+            // Оновлюємо дані на сторінці
+            if (pageId === 'shop') renderShop();
+            if (pageId === 'admin') renderAdmin();
+        }
+// ВІДОБРАЖЕННЯ В МАГАЗИНІ
+        function renderShop() {
+            var cont = document.getElementById('shop-container');
+            cont.innerHTML = "";
+            for (var i = 0; i < products.length; i++) {
+                var p = products[i];
+                cont.innerHTML += '<div class="product-card">' +
+                    '<h3>' + p.name + '</h3>' +
+                    '<p style="color:green; font-weight:bold;">' + p.price + '</p>' +
+                    '<button class="order-btn" onclick="orderNow(\'' + p.name + '\')">Замовити</button>' +
+                    '</div>';
+            }
+        }
+
+        // ВІДОБРАЖЕННЯ В АДМІНЦІ
+        function renderAdmin() {
+            var cont = document.getElementById('admin-container');
+            cont.innerHTML = "";
+            for (var i = 0; i < products.length; i++) {
+                var p = products[i];
+                cont.innerHTML += '<div class="admin-item">' +
+                    '<span>' + p.name + ' (' + p.price + ')</span>' +
+                    '<button onclick="removeProduct(' + i + ')" style="color:red; cursor:pointer;">Видалити</button>' +
+                    '</div>';
+            }
+        }
+
+        // ДОДАТИ ТОВАР
+        function addNewProduct() {
+            var n = document.getElementById('addName').value;
+            var p = document.getElementById('addPrice').value;
+            if (n && p) {
+                products.push({ name: n, price: p });
+                localStorage.setItem('3dverse_prods', JSON.stringify(products));
+                alert("Товар додано!");
+                document.getElementById('addName').value = "";
+                document.getElementById('addPrice').value = "";
+                renderAdmin();
+            } else {
+                alert("Заповніть назву та ціну!");
+            }
+        }
+
+        // ВИДАЛИТИ ТОВАР
+        function removeProduct(index) {
+            if (confirm("Видалити товар?")) {
+                products.splice(index, 1);
+                localStorage.setItem('3dverse_prods', JSON.stringify(products));
+                renderAdmin();
+            }
+        }
+
+        // ВІДПРАВКА В ТЕЛЕГРАМ
+        function orderNow(pName) {
+            var contact = prompt("Замовляємо: " + pName + "\nВаш номер телефону або Telegram:");
+            if (contact && contact.trim() !== "") {
+                var msg = encodeURIComponent("📦 Нове замовлення!\nТовар: " + pName + "\nКонтакт: " + contact);
+                var url = "https://api.telegram.org/bot" + BOT_TOKEN + "/sendMessage?chat_id=" + USER_ID + "&text=" + msg;
+                
+                fetch(url).then(function(res) {
+                    if (res.ok) alert("Замовлення надіслано в Telegram!");
+                    else alert("Помилка Telegram. Перевірте, чи ви натиснули START у боті.");
+                }).catch(function() {
+                    alert("Помилка з'єднання.");
+                });
+            }
+        }
+
+        // Початкове завантаження
+        window.onload = function() {
+            renderShop();
+        };
+    </script>
+</body>
+</html>
